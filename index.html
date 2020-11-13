@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>画板</title>
+    <title>画板点的移动</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -17,22 +17,34 @@
     canvas.width = document.documentElement.clientWidth
     canvas.height = document.documentElement.clientHeight
     let ctx = canvas.getContext("2d");
+    // 是否是移动设备
+    let isTouchDevice = 'ontouchstart' in document.documentElement
+    // 画板画出点与点
+    let canvasMove = (e) => {
+        if (isTouchDevice || painting) {
+            ctx.beginPath();
+            ctx.arc(e.clientX, e.clientY, 2, 0, 2 * Math.PI, false);
+            ctx.fill();
+            ctx.stroke();
+        }
+    }
+    // 颜色
     ctx.fillStyle = "bilck";
     ctx.strokeStyle = 'none'
     let painting = false;
-    canvas.onmousedown = () => {
-        painting = true
-    }
-    canvas.onmouseup = () => {
-        painting = false
-    }
-    canvas.onmousemove = (e) => {
-        if (painting) {
-            ctx.beginPath();
-            ctx.arc(e.clientX, e.clientY, 2, 0, 2 * Math.PI, false);
-            ctx.fill()
-            ctx.stroke();
-            // ctx.fillRect(e.clientX - 5, e.clientY - 5, 10, 10);
+    if (isTouchDevice) {
+        canvas.ontouchmove = (e) => {
+            canvasMove(e.touches[0])
+        }
+    } else {
+        canvas.onmousedown = () => {
+            painting = true
+        }
+        canvas.onmouseup = () => {
+            painting = false
+        }
+        canvas.onmousemove = (e) => {
+            canvasMove(e)
         }
     }
 </script>
